@@ -3,15 +3,12 @@ package jm.task.core.jdbc.dao;
 import jm.task.core.jdbc.model.User;
 import jm.task.core.jdbc.util.Util;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 
-import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import java.util.List;
 
 
 public class UserDaoHibernateImpl implements UserDao {
-
 
     public UserDaoHibernateImpl() {
 
@@ -19,101 +16,113 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public void createUsersTable() {
-        Transaction tx = null;
-        try (Session session = Util.getSessionFactory().openSession()) {
-            tx = session.beginTransaction();
+        Session session = Util.getSessionFactory().openSession();
+        try {
+            session.getTransaction().begin();
             String sql = "CREATE TABLE IF NOT EXISTS users (id BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT, name VARCHAR(80), lastName VARCHAR(80), age TINYINT);";
             Query query = session.createSQLQuery(sql);
             query.executeUpdate();
-            tx.commit();
-        } catch (PersistenceException e) {
-            if (tx != null) {
-                tx.rollback();
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            if (session.getTransaction().getStatus().canRollback()) {
+                session.getTransaction().rollback();
             }
             e.printStackTrace();
+        } finally {
+            session.close();
         }
     }
 
     @Override
     public void dropUsersTable() {
-        Transaction tx = null;
-        try (Session session = Util.getSessionFactory().openSession()) {
-            tx = session.beginTransaction();
+        Session session = Util.getSessionFactory().openSession();
+        try {
+            session.getTransaction().begin();
             String sql = "DROP TABLE IF EXISTS users;";
             Query query = session.createSQLQuery(sql);
             query.executeUpdate();
-            tx.commit();
-        } catch (PersistenceException e) {
-            if (tx != null) {
-                tx.rollback();
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            if (session.getTransaction().getStatus().canRollback()) {
+                session.getTransaction().rollback();
             }
             e.printStackTrace();
+        } finally {
+            session.close();
         }
     }
 
     @Override
-    public void saveUser(String name, String lastName, byte age) {
-        Transaction tx = null;
+    public void saveUser(String name, String lastName, byte age) throws Exception {
+        Session session = Util.getSessionFactory().openSession();
         User user = new User(name, lastName, age);
-        try (Session session = Util.getSessionFactory().openSession()) {
-            tx = session.beginTransaction();
+        try {
+            session.getTransaction().begin();
             session.save(user);
             System.out.printf("User с именем %s добавлен в базу данных\n", name);
-            tx.commit();
-        } catch (PersistenceException e) {
-            if (tx != null) {
-                tx.rollback();
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            if (session.getTransaction().getStatus().canRollback()) {
+                session.getTransaction().rollback();
             }
-            throw new PersistenceException();
+            throw new Exception();
+        } finally {
+            session.close();
         }
     }
 
     @Override
-    public void removeUserById(long id) {
-        Transaction tx = null;
-        try (Session session = Util.getSessionFactory().openSession()) {
+    public void removeUserById(long id) throws Exception {
+        Session session = Util.getSessionFactory().openSession();
+        try {
             User user = session.get(User.class, id);
-            tx = session.beginTransaction();
+            session.getTransaction().begin();
             session.delete(user);
-            tx.commit();
-        } catch (PersistenceException e) {
-            if (tx != null) {
-                tx.rollback();
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            if (session.getTransaction().getStatus().canRollback()) {
+                session.getTransaction().rollback();
             }
-            throw new PersistenceException();
+            throw new Exception();
+        } finally {
+            session.close();
         }
     }
 
     @Override
-    public List<User> getAllUsers() {
-        Transaction tx = null;
+    public List<User> getAllUsers() throws Exception {
+        Session session = Util.getSessionFactory().openSession();
         List<User> users;
-        try (Session session = Util.getSessionFactory().openSession()) {
-            tx = session.beginTransaction();
+        try {
+            session.getTransaction().begin();
             users = session.createSQLQuery("SELECT * FROM users").addEntity(User.class).getResultList();
-            tx.commit();
-        } catch (PersistenceException e) {
-            if (tx != null) {
-                tx.rollback();
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            if (session.getTransaction().getStatus().canRollback()) {
+                session.getTransaction().rollback();
             }
-            throw new PersistenceException();
+            throw new Exception();
+        } finally {
+            session.close();
         }
         return users;
     }
 
     @Override
-    public void cleanUsersTable() {
-        Transaction tx = null;
-        try (Session session = Util.getSessionFactory().openSession()) {
-            tx = session.beginTransaction();
+    public void cleanUsersTable() throws Exception {
+        Session session = Util.getSessionFactory().openSession();
+        try {
+            session.getTransaction().begin();
             Query query = session.createSQLQuery("DELETE FROM users");
             query.executeUpdate();
-            tx.commit();
-        } catch (PersistenceException e) {
-            if (tx != null) {
-                tx.rollback();
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            if (session.getTransaction().getStatus().canRollback()) {
+                session.getTransaction().rollback();
             }
-            throw new PersistenceException();
+            throw new Exception();
+        } finally {
+            session.close();
         }
     }
 }

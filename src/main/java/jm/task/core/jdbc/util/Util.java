@@ -6,9 +6,6 @@ import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,17 +17,6 @@ public class Util {
     private static final String driver = "com.mysql.cj.jdbc.Driver";
     private static SessionFactory sessionFactory;
     private static StandardServiceRegistry registry;
-
-    public static Connection getMySQLConnection() {
-        Connection connection = null;
-        try {
-            Class.forName(driver);
-            connection = DriverManager.getConnection(url, username, password);
-        } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
-        }
-        return connection;
-    }
 
     public static SessionFactory getSessionFactory() {
         if (sessionFactory == null) {

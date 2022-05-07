@@ -6,6 +6,7 @@ import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 
+import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,5 +38,9 @@ public class Util {
             }
         }
         return sessionFactory;
+    }
+
+    public static Connection getMySQLConnection() {
+        return null;
     }
 }
